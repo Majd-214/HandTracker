@@ -4,13 +4,13 @@ import time
 import HandTrackingModule as Htm
 
 cap = cv2.VideoCapture(0)
-detector = Htm.HandDetector
+detector = Htm.HandDetector()
 previous_time = 0
 
 while True:
     success, img = cap.read()
     img = detector.find_hands(img, True)
-    pos_list = detector.find_position(img)
+    pos_list = detector.find_position(img, draw=False)
 
     if len(pos_list) != 0:
         print(pos_list[8])
