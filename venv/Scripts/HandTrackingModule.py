@@ -11,9 +11,12 @@ class HandDetector:
         self.detection_con = detection_con
         self.track_con = track_con
         self.results = None
+        self.pos_list = None
         self.mp_hands = mp.solutions.hands
-        self.hands = self.mp_hands.Hands(self.mode, self.max_hands, self.model_complexity, self.detection_con, self.track_con)
+        self.hands = self.mp_hands.Hands(self.mode, self.max_hands, self.model_complexity, self.detection_con,
+                                         self.track_con)
         self.mp_draw = mp.solutions.drawing_utils
+        self.fingertips = [4, 8, 12, 16, 20]
 
     def find_hands(self, img, draw=True):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -28,7 +31,7 @@ class HandDetector:
 
     def find_position(self, img, hand_no=0, draw=True):
 
-        pos_list = []
+        self.pos_list = []
         if self.results.multi_hand_landmarks:
             my_hand = self.results.multi_hand_landmarks[hand_no]
             for lm_id, lm in enumerate(my_hand.landmark):
@@ -36,11 +39,30 @@ class HandDetector:
                 h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 # print(id, cx, cy)
-                pos_list.append([lm_id, cx, cy])
+                self.pos_list.append([lm_id, cx, cy])
                 if draw:
                     cv2.circle(img, (cx, cy), 15, (255, 0, 255), cv2.FILLED)
 
-        return pos_list
+        return self.pos_list
+
+    def fingers_up(self):
+        fingers = []
+
+        # Thumb
+        if (self.pos_list[self.fingertips[0]][1] > self.pos_list[self.fingertips[0] - 1][1] and self.pos_list[5][1] >
+            self.pos_list[17][1]) or (self.pos_list[self.fingertips[0]][1] < self.pos_list[self.fingertips[0] - 1][1]
+                                      and self.pos_list[5][1] < self.pos_list[17][1]):
+            fingers.append(1)
+        else:
+            fingers.append(0)
+
+        # 4 Fingers
+        for lm_id in range(1, 5):
+            if self.pos_list[self.fingertips[lm_id]][2] < self.pos_list[self.fingertips[lm_id] - 2][2]:
+                fingers.append(1)
+            else:
+                fingers.append(0)
+        return fingers
 
 
 def main():
