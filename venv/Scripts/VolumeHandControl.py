@@ -23,10 +23,23 @@ previous_time = 0
 
 while True:
     success, img = cap.read()
-    img = detector.find_hands(img, True)
-    pos_list = detector.find_position(img, draw=False)
 
+    # Find Hand
+    img = detector.find_hands(img, True)
+    pos_list = detector.find_position(img, draw_lm=False)
     if len(pos_list) != 0:
+
+        # Filter based on size
+
+        # Find distance between index and thumb
+
+        # Convert Volume
+        # Reduce resolution to increase usability
+        # Check fingers Up/Down
+        # If pinkie is down, set volume
+        # Drawings
+        # Frame rate
+
         # print(pos_list[4], pos_list[8])
 
         x1, y1 = pos_list[4][1], pos_list[4][2]
