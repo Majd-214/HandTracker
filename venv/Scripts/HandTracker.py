@@ -1,16 +1,15 @@
-import cv2
-import mediapipe as mp
 import time
+import cv2
 import HandTrackingModule as Htm
 
 cap = cv2.VideoCapture(0)
-detector = Htm.HandDetector()
+detector = Htm.HandDetector(max_hands=1, detection_con=0.6)
 previous_time = 0
 
 while True:
     success, img = cap.read()
     img = detector.find_hands(img, True)
-    pos_list = detector.find_position(img, draw=False)
+    pos_list = detector.find_position(img, draw_lm=False)
 
     if len(pos_list) != 0:
         print(pos_list[8])
