@@ -30,7 +30,10 @@ class HandDetector:
                     self.mp_draw.draw_landmarks(img, landmark, self.mp_hands.HAND_CONNECTIONS)
         return img
 
-    def find_position(self, img, hand_no=0, draw=True):
+    def find_position(self, img, hand_no=0, draw_lm=True, draw_box=True, box_offset=0, draw_box_offset=20):
+        x_list = []
+        y_list = []
+        bounding_box = []
 
         self.pos_list = []
         if self.results.multi_hand_landmarks:
@@ -39,12 +42,20 @@ class HandDetector:
                 # print(id, lm)
                 h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
+                x_list.append(cx)
+                y_list.append(cy)
                 # print(id, cx, cy)
                 self.pos_list.append([lm_id, cx, cy])
-                if draw:
-                    cv2.circle(img, (cx, cy), 15, (255, 0, 255), cv2.FILLED)
+                if draw_lm:
+                    cv2.circle(img, (cx, cy), 10, (255, 0, 255), cv2.FILLED)
+            x_min, x_max = min(x_list)-box_offset, max(x_list)+box_offset
+            y_min, y_max = min(y_list)-box_offset, max(y_list)+box_offset
+            bounding_box = [(x_min, y_min), (x_max, y_max)]
+            if draw_box:
+                cv2.rectangle(img, (bounding_box[0][0]-draw_box_offset, bounding_box[0][1]-draw_box_offset),
+                              (bounding_box[1][0]+draw_box_offset, bounding_box[1][1]+draw_box_offset), (0, 255, 0), 2)
 
-        return self.pos_list
+        return self.pos_list, bounding_box
 
     def fingers_up(self):
         fingers = []
@@ -65,7 +76,7 @@ class HandDetector:
                 fingers.append(0)
         return fingers
 
-    def find_distance(self, p1, p2, img, draw=True, r=15, t=3):
+    def find_distance(self, img, p1, p2, draw=True, r=10, t=3):
         x1, y1 = self.pos_list[p1][1:]
         x2, y2 = self.pos_list[p2][1:]
         cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
@@ -77,7 +88,7 @@ class HandDetector:
             cv2.circle(img, (cx, cy), r, (0, 0, 255), cv2.FILLED)
             length = math.hypot(x2 - x1, y2 - y1)
 
-        return length, img, [x1, y1, x2, y2, cx, cy]
+        return length, [x1, y1, x2, y2, cx, cy]
 
 
 def main():
