@@ -28,7 +28,7 @@ fingertips = [4, 8, 12, 16, 20]
 while True:
     success, img = cap.read()
     img = detector.find_hands(img)
-    landmarks = detector.find_position(img, draw=False)
+    landmarks, bounding_box = detector.find_position(img, draw=False)
     # print(landmarks)
 
     if len(landmarks) != 0:
