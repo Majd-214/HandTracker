@@ -80,6 +80,7 @@ class HandDetector:
         x1, y1 = self.pos_list[p1][1:]
         x2, y2 = self.pos_list[p2][1:]
         cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
+        length = 0
 
         if draw:
             cv2.line(img, (x1, y1), (x2, y2), (255, 0, 255), t)
@@ -98,7 +99,7 @@ def main():
     while True:
         success, img = cap.read()
         img = detector.find_hands(img)
-        lm_list = detector.find_position(img, draw=False)
+        lm_list = detector.find_position(img, draw_lm=False)
         if len(lm_list) != 0:
             print(lm_list[8])
 
